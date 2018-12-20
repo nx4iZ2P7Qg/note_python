@@ -35,6 +35,7 @@ list1.count("c")
 list1.remove("f")
 
 print("pop = " + list1.pop())
+print(list1)
 
 print("len = " + str(len(list1)))
 
@@ -47,11 +48,8 @@ def take_second(elem):
     return elem[1]
 
 
-random = [(1, 2), (1, 4), (1, 1), (1, 3)]
-random.sort(key=take_second)
-
-print(index1)
-print(random)
-print(list1)
+list4 = [(1, 2), (1, 4), (1, 1), (1, 3)]
+list4.sort(key=take_second)
+print(list4)
 # 清空
 list1.clear()
