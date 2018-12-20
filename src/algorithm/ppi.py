@@ -14,10 +14,11 @@ SCREEN_SIZE_27 = 27
 def calculate_ppi(width_pixel_count, height_pixel_count, screen_size):
     """
     计算屏幕PPI
-    :param width_pixel_count:横向像素点数
-    :param height_pixel_count:纵向像素点数
-    :param screen_size:屏幕尺寸
-    :return:PPI
+
+    :param width_pixel_count: 横向像素点数
+    :param height_pixel_count: 纵向像素点数
+    :param screen_size: 屏幕尺寸
+    :return: PPI
     """
     return math.sqrt(pow(width_pixel_count, 2) + pow(height_pixel_count, 2)) / screen_size
 

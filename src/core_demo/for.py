@@ -1,4 +1,4 @@
-aList = ["a", "b"]
+aList = ['a', 'b']
 for s in aList:
     print(s)
 
@@ -9,13 +9,13 @@ for i in range(len(a)):
 
 # enumerate()比较方便
 for i in enumerate(a):
-    print("enumerate = " + str(i))
+    print('enumerate = ' + str(i))
 
 # for循环可以接收iterable，list()也可以
 for i in list(('a', 'b')):
     print('list = ' + i)
 
-words = [" ", "tomorrow"]
+words = [' ', 'tomorrow']
 # for内部修改了迭代对象words，如果没有[:]，程序无限循环
 # 修改迭代对象时建议先使用[:]复制
 for w in words[:]:

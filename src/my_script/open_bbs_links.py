@@ -14,7 +14,7 @@ opener.addheaders = [headers]
 linkDate = input('input the linkDate: ')
 
 # 1024
-url = input("input the linkUrl: ")
+url = input('input the linkUrl: ')
 netPageSource = opener.open(url).read().decode('utf-8')
 links = re.findall('\t\t<a href="(.*.html)">\[' + linkDate[:2] + '-' + linkDate[2:] + '\]', netPageSource)
 
@@ -26,7 +26,7 @@ links = re.findall('\t\t<a href="(.*.html)">\[' + linkDate[:2] + '-' + linkDate[
 # print(links)
 
 n = 0
-print("there are totally " + str(len(links)) + " links")
+print('there are totally ' + str(len(links)) + ' links')
 for link in links:
     webbrowser.open(url[: url.rfind('/') + 1] + link)
     n += 1

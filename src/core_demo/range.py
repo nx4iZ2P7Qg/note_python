@@ -15,4 +15,4 @@ range(-10, -100, -30)
 # 类似函数可变形参个数的用法
 variable_length_arg = 1, 10
 for x in range(*variable_length_arg):
-    print(x, end=" ")
+    print(x, end=' ')
