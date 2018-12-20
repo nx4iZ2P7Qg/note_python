@@ -70,3 +70,11 @@ print(id(i1) == id(i2))
 # 如果有多行，第二行必须是空行
 # 对齐问题参考https://docs.python.org/3/tutorial/controlflow.html#documentation-strings
 # print(my_function.__doc__)查看函数文档描述
+
+""" 解压赋值 """
+tuple1 = (4, 5)
+x, y = tuple1
+# 可作用于任何可迭代对象
+string1 = 'abc'
+a, b, c = string1
+# 这种语法估计不如[]用得多
