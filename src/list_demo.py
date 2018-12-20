@@ -61,6 +61,11 @@ def take_second(elem):
 
 list4 = [(1, 2), (1, 4), (1, 1), (1, 3)]
 list4.sort(key=take_second)
-print(list4)
+print('sorted list4 = ' + str(list4))
 # 清空
 list1.clear()
+
+# 从tuple转型
+tuple1 = 'a', 'b', 'c'
+list5 = list(tuple1)
+print('list5 = ' + str(list5))
