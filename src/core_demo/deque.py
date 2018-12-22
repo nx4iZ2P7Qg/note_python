@@ -1,4 +1,5 @@
 from collections import deque
+
 """
 双端队列
 """

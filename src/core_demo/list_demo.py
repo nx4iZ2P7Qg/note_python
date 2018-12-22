@@ -88,6 +88,16 @@ print('squares2 = ' + str(squares2))
 squares3 = [x ** 2 for x in range(10)]
 print('squares3 = ' + str(squares3))
 
+list_of_countries = ["India", "America", "England", "Germany", "Brazil", "Vietnam"]
+firstLetters = [country[0] for country in list_of_countries]
+print(firstLetters)
+print([x + y for x in 'get' for y in 'set'])
+print([x + y for x in 'get' for y in 'set' if x != 't' and y != 'e'])
+
+# 要同时使用索引与元素，可以使用
+for index, element in enumerate(list_of_countries):
+    print(index, element)
+
 # zip() 二维list行列转换
 # zip() 用于将可迭代的对象作为参数，将对象中对应的元素打包成一个个元组，然后返回由这些元组组成的对象
 list6 = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
