@@ -25,7 +25,7 @@
 
 # scope resolution
 # 对于一个name的解析，从innermost开始，一步一步向上层寻找，若找不到抛出NameError
-a_var = 10
+b_var = 10
 print("begin()-> ", dir())
 
 
@@ -38,9 +38,45 @@ foo()
 print("end()-> ", dir())
 # dir()列出所有可用的names
 
+c_var = 5
+d_var = 7
+
+
+def outer_foo():
+    global c_var
+    c_var = 3
+    d_var = 9
+
+    def inner_foo():
+        global c_var
+        c_var = 4
+        d_var = 8
+        print('a_var inside inner_foo :', c_var)
+        print('b_var inside inner_foo :', d_var)
+
+    inner_foo()
+    print('a_var inside outer_foo :', c_var)
+    print('b_var inside outer_foo :', d_var)
+
+
+outer_foo()
+print('a_var outside all functions :', c_var)
+print('b_var outside all functions :', d_var)
+
 # 如何正确地import module
 # from <module name> import *
 # 导入所有module的name到当前namespace，但不能确定某些函数是哪个module导入的
+print("namespace_1: ", dir())
+
+from math import *
+
+print("namespace_2: ", dir())
+print(sqrt(144.2))
+
+from cmath import *
+
+print("namespace_3: ", dir())
+print(sqrt(144.2))
 # 如果导入的两个module中有相同的函数名，后导入的函数会覆盖之前导入的函数，之前导入的函数不可用，即使用模块名作前缀也不行
 # from <module name> import <foo_1>, <foo_2>
 # 如果能确定要使用的名称，可以直接导入
