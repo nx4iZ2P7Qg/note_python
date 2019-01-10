@@ -17,8 +17,6 @@
 # <a+>	append读，Same behavior as for append mode.
 # <ab+>	append读二进制，Same behavior as for append mode.
 
-import os
-
 path_file_origin = 'd:/io_test.txt'
 path_file_new = 'd:/io_test.backup.txt'
 
@@ -40,10 +38,3 @@ with open(path_file_origin, mode='w+', encoding='utf-8', buffering=512) as f:
 
 for line in contents:
     print(line)
-
-os.rename(path_file_origin, path_file_new)
-# os.remove("app1.log")
-os.getcwd()
-os.chdir('d:')
-os.mkdir('d:/python_test_dir', 777)
-os.rmdir('d:/python_test_dir')

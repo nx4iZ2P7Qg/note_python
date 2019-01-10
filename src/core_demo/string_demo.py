@@ -1,5 +1,3 @@
-import os
-
 # 普通字符串使用8位ASCII储存
 # unicode使用16位ASCII储存，使用u标识
 print(u'Hello Python!!')
@@ -58,9 +56,6 @@ s.splitlines(True)
 # 左右trim，默认处理空白字符
 s.lstrip('a')
 s.rstrip('b')
-
-# 拼接路径
-print(os.path.join('d:', os.path.sep, 'fold', 'sub_fold', 'sub_fold'))
 
 # 格式字符
 print("Employee Name: %s,\nEmployee Age:%d" % ('Aisha', 25))
