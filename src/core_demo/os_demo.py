@@ -17,3 +17,7 @@ os.getcwd()
 os.chdir('d:')
 os.mkdir('d:/python_test_dir', 777)
 os.rmdir('d:/python_test_dir')
+
+# 遍历
+for root, dirs, files in os.walk(r'C:\Users\DF\Desktop\corejava9'):
+    print(f'root = {root}, dirs = {dirs}, files = {files}')
