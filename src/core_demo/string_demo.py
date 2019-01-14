@@ -1,3 +1,5 @@
+from string import Template
+
 # 普通字符串使用8位ASCII储存
 # unicode使用16位ASCII储存，使用u标识
 print(u'Hello Python!!')
@@ -43,8 +45,8 @@ s.zfill(12)
 s.find('c', 1, 3)
 s.rfind('c', 1, 3)
 # 定位，找不到抛ValueError
-s.index('c', 1, 3)
-s.rindex('a', 1, 3)
+s.index('o', 1, 8)
+s.rindex('o', 1, 8)
 # 替换，次数可指定
 s.replace('a', 'c', 3)
 # split，默认以空格分隔，可以指定次数
@@ -57,7 +59,7 @@ s.splitlines(True)
 s.lstrip('a')
 s.rstrip('b')
 
-# 格式字符
+# 旧式格式化，会获得很长的支持，但不建议使用
 print("Employee Name: %s,\nEmployee Age:%d" % ('Aisha', 25))
 # 完整格式
 # %c	character
@@ -73,3 +75,24 @@ print("Employee Name: %s,\nEmployee Age:%d" % ('Aisha', 25))
 # %f	floating point real number
 # %g	the shorter of %f and %e
 # %G	the shorter of %f and %E
+
+# 新式格式化
+print('hello, {name}'.format(name='re2'))
+
+# f-string, python 3.6+
+s1 = 'hello'
+s2 = 'world'
+print(f'{s1}, {s2}')
+
+# 简单但在某些时候有用的字符串模板
+name = 'aaa'
+error_no = 12
+template_string = 'Hey $name, there is a $error error!'
+print(Template(template_string).substitute(name=name, error=hex(error_no)))
+
+# if 用户输入的字符，使用Template
+# else
+#   if python 3.6+
+#       使用f-string
+#   else
+#       使用format
