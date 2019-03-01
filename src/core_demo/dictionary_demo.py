@@ -24,6 +24,12 @@ del dic2['pwd']
 dic2.clear()
 del dic2
 
+# 判断相等
+# 它会考虑到key的数量，key的名字，每个key对应的值，同时会递归到复杂结构
+dic3 = {'a': 'a', 'b': 'b'}
+dic4 = {'b': 'b', 'a': 'a'}
+print(f'dic3 == dic4: {dic3 == dic4}')
+
 print('email' in dic1)
 
 # dictionary comprehension
