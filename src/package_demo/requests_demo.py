@@ -2,6 +2,7 @@ import requests
 
 # 一般http请求
 r01 = requests.get('https://api.github.com/events')
+r01.raise_for_status()
 r02 = requests.post('http://httpbin.org/post', data={'key': 'value'})
 r03 = requests.put('http://httpbin.org/put', data={'key': 'value'})
 r04 = requests.delete('http://httpbin.org/delete')
