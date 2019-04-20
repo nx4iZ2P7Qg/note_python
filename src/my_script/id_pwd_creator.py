@@ -49,7 +49,7 @@ print(reId)
 i = 0
 # 返回pwd
 rePwd = ''
-while i <= random.randint(6, 10):  # 生成6-10位随机的密码
+while i <= random.randint(10, 12):  # 生成6-10位随机的密码
     rePwd += str(randomPwdList[random.randint(0, len(randomPwdList) - 1)])
     i += 1
 print(rePwd)
