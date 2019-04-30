@@ -37,3 +37,30 @@ print({i: ord(i) for i in ['a', 'b', 'c', 'd', 'e']})
 weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 x1 = {w: len(w) for w in weekdays}
 x2 = {w: i for i, w in enumerate(weekdays)}
+
+# 求最小value
+price = {
+    'a': 33.33,
+    'b': 22.22,
+    'c': 11.11,
+    'd': 44.44,
+    'e': 55.55
+}
+min_price = min(zip(price.values(), price.keys()))
+print(dict(zip(price.values(), price.keys())))
+
+# 给切片命名以提高代码可读性
+str_x = 'xxx_sophia_xxx'
+name = slice(4, 10)
+print(str_x[name])
+
+# 找出序列中出现频次最多的元素
+words = [
+    'look', 'into', 'my', 'eyes', 'look', 'into', 'my', 'eyes',
+    'the', 'eyes', 'the', 'eyes', 'the', 'eyes', 'not', 'around', 'the',
+    'eyes', "don't", 'look', 'around', 'the', 'eyes', 'look', 'into',
+    'my', 'eyes', "you're", 'under'
+]
+from collections import Counter
+word_counts = Counter(words)
+print(word_counts.most_common(3))
