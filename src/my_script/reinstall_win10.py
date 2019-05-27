@@ -6,64 +6,52 @@ import shutil
 PATH_BACK_UP_ROOT_DESKTOP = 'z:/back_up/desktop/'
 
 # ============================== 软件配置 ==============================
-
 # filezilla 配置
 PATH_FILEZILLA = "C:/Users/DF/AppData/Roaming/FileZilla/"
-
 # obs配置
-PATH_OBS = 'C:/Users/DF/AppData/Roaming/obs-studio/basic/profiles/Untitled/'
-
+PATH_OBS = 'C:/Users/DF/AppData/Roaming/obs-studio/basic/profiles/'
 # thunderbird
-
+PATH_THUNDER_BIRD = 'C:/Users/DF/AppData/Roaming/Thunderbird/Profiles/'
 # firefox developer edition
-
+PATH_FIREFOX_DEVELOPER = 'C:/Users/DF/AppData/Roaming/Mozilla/Firefox/Profiles/'
 # chrome
-
 # idea
-
 # intellij idea
-
 # intellij idea community edition
-
 # intellij pycharm community edition
-
 # postman请求
 
 
 # ============================== 游戏 ==============================
-
 # 夏娃年代记 哈尼喵汉化组
 PATH_EVENICLE = 'C:/Users/DF/Documents/AliceSoft/夏娃年代记汉化版V1.00【哈尼喵汉化组】 此汉化免费发布，若是花了钱，请去退货退款给差评/'
-
 # FF12 CPY
 PATH_FFXII = 'C:/Users/DF/Documents/My Games/FINAL FANTASY XII THE ZODIAC AGE/'
-
 # 上古卷轴5 天际
 PATH_THE_ELDER_SCROLLS_V_SKYRIM = 'C:/Users/DF/Documents/My Games/Skyrim Special Edition/'
-
 # FFVIII STEAM FLT
 PATH_FFVIII = 'C:/Users/DF/Documents/Square Enix/FINAL FANTASY VIII Steam/'
-
 # 生化危机4 终极高清版 3DM
 PATH_RE4 = 'C:/ProgramData/Steam/3DMGAME/254700/'
-
 # 怪物猎人世界 CODEX
 PATH_MHW = 'C:/Users/Public/Documents/Steam/CODEX/582010/'
-
 # 生化危机2 重制版 CODEX
 PATH_RE2_RE = 'C:/Users/Public/Documents/Steam/CODEX/883710/'
-
 # vr女友 DARKSIDERS
 PATH_VR_KANOJO = 'D:/games/VR Kanojo/UserData/'
-
 # honey select zod
 PATH_HONEY_SELECT = 'D:/games/HoneySelect/UserData/'
 
+# ============================== 模拟器 ==============================
 # dolphin
 PATH_DOLPHIN_CONFIG = 'C:/Users/DF/Documents/Dolphin Emulator/Config/'
 PATH_DOLPHIN_SCREENSHOTS = 'C:/Users/DF/Documents/Dolphin Emulator/ScreenShots/'
 
-back_up_tuple = {
+# ============================== 工作文档 ==============================
+# 手动备份内容
+PATH_WORK_DOCUMENT = 'D:/backup/'
+
+back_up_tuple_desktop = {
     PATH_FILEZILLA,
     PATH_OBS,
 
@@ -81,6 +69,21 @@ back_up_tuple = {
     PATH_DOLPHIN_SCREENSHOTS,
 }
 
+back_up_tuple_laptop = {
+    PATH_FILEZILLA,
+    PATH_THUNDER_BIRD,
+    PATH_FIREFOX_DEVELOPER,
+
+    PATH_WORK_DOCUMENT,
+}
+
+choice = input("please choose back_up_tuple\n1==desktop\n2==laptop")
+back_up_tuple = None
+if choice == 1:
+    back_up_tuple = back_up_tuple_desktop
+elif choice == 2:
+    back_up_tuple = back_up_tuple_laptop
+
 for path_src in back_up_tuple:
     if not os.path.exists(path_src):
         print(f'not exist continue {path_src}')
@@ -94,4 +97,3 @@ for path_src in back_up_tuple:
         print(f'exist continue {path_dst}')
         continue
     shutil.copytree(path_src, path_dst)
-
