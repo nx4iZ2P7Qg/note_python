@@ -1,3 +1,4 @@
+# coding=utf-8
 import math
 
 RESOLUTION_4K_WIDTH = 3840
