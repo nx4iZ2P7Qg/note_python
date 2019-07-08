@@ -1,6 +1,8 @@
 # coding=utf-8
 
 import requests
+import time
+import random
 
 
 def get_pic_by_bangou(bangou, target_dir='.'):
@@ -9,7 +11,7 @@ def get_pic_by_bangou(bangou, target_dir='.'):
 
     :param bangou: 车牌号
     :param target_dir: 目录
-    :return:
+    :return: 无
     """
     # 各网站路径抽象
     catalog_dict = {
@@ -33,11 +35,17 @@ def get_pic_by_bangou(bangou, target_dir='.'):
             # 'https://image.mgstage.com/images/prestigepremium/300maan/341 /pb_e_300maan-341.jpg'
             link = f'https://pics.dmm.co.jp/mono/movie/adult/{temp}/{temp}pl.jpg'
         print(f'link = {link}')
-        response = requests.get(link)
+        headers = {
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
+        }
+        # 随机休眠
+        time.sleep(random.randint(6, 30) / 3)
+        response = requests.get(link, headers=headers)
         response.raise_for_status()
         with open(f'{target_dir}/{bangou}.jpg', 'wb') as jpg:
             jpg.write(response.content)
         break
 
 
-get_pic_by_bangou('ipx-232', 'd:')
+get_pic_by_bangou('300MAAN-341', 'd:')
