@@ -1,13 +1,24 @@
+# coding=utf-8
+
 import tts.sapi
 import os
 
-# voice = tts.sapi.Sapi()
-# print(voice.get_voice_names())
-# voice.set_voice('Huihui')
-# voice.set_rate(3)
-# voice.say('在 north point 的酒吧')
-# voice.say('作为一个死宅，不可能就这样算了对吧 哔哩哔哩 estamir')
+voice = tts.sapi.Sapi()
+print(voice.get_voice_names())
+# 英文
+# voice.set_voice('David')
+# voice.set_voice('Zira')
+# 日文
 # voice.set_voice('Haruka')
+# 中文
+voice.set_voice('Huihui')
+voice.set_rate(3)
+# voice.say('在 north point 的酒吧')
+voice.say('''
+
+
+
+''')
 # voice.say('エスタミル')
 # voice.create_recording('d:/output.wav', '看看效果如何，A C G')
 
@@ -32,4 +43,4 @@ def create_wav_by_file(source_dir, des_dir):
             voice.create_recording(des_dir + '/' + file + '.wav', source_file.read())
 
 
-create_wav_by_file('D:/Download/saga/tts_text', 'd:/download/saga/tts_voice')
+# create_wav_by_file('D:/Download/saga/tts_text', 'd:/download/saga/tts_voice')
