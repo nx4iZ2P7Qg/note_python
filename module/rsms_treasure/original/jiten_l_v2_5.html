@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<!--
+ - 発掘スキルをS1-S5の選択式に変更しました。
+ - 各種フォームが前回の使用履歴を参照して選択済みになるようにしました。
+ - HTML5対応のブラウザで利用可能なLocalStorageという技術を使用しています。
+-->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <title>発掘大辞典2</title>
+    <script type="text/javascript" src="./js/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="./jiten_v2_5.js" defer></script>
+    <link rel="stylesheet" href="./css/jiten.css" type="text/css" media="screen" charset="UTF-8">
+</head>
+<a href="./manual_v2_5.html" target="_blank">ver2.5説明書</a>（別窓）
+<hr>
+<h1 class="logo" align=center>発掘大辞典ver2.5</h1>
+
+
+<form name="F1">
+
+    <div class='tg-list-item' align=center>
+        <input class='tgl tgl-flip' id='country' type='checkbox'>
+        <label class='tgl-btn' data-tg-off='国内版' data-tg-on='北米版' for='country'></label>
+    </div>
+
+
+    <br>
+
+    <b>タイミング調整</b>
+    <br>（どれか一つ）
+    <br>
+    <table border="1">
+        <tbody>
+        <tr>
+            <td>アサシンギルドから
+                <br>
+                <input class="ROUND" type="text" name="TGldShousetsu" size="3" value="0" onchange="TGldChange()">小節
+                <input class="ROUND" type="text" name="TGldHaku" size="3" value="0" onchange="TGldChange()">拍 遅れ
+            </td>
+        </tr>
+        <tr>
+            <td>1小節1拍がID
+                <input class="ROUND" type="text" name="T11ID" size="5" value="0" onchange="T11Change()">
+            </td>
+        </tr>
+        <tr>
+            <td>ID
+                <input class="ROUND" type="text" name="TPPID" size="5" value="0" onchange="TPPChange()">が
+                <br>
+                <input class="ROUND" type="text" name="TPPShousetsu" size="3" value="1" onchange="TPPChange()">小節
+                <input class="ROUND" type="text" name="TPPHaku" size="3" value="1" onchange="TPPChange()">拍
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+    <b>財宝金額表示オプション</b>
+    <br>（どれか一つ）
+    <br>
+    <table border="1">
+        <tbody>
+        <tr>
+            <td>
+                <input type="radio" name="ShowMoney" value="none">金額表示無し
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="radio" name="ShowMoney" value="simple">シンプル金額表示
+            </td>
+        </tr>
+        <tr class="domestic">
+            <td>
+                <input type="radio" name="ShowMoney" value="full">サブ左で金額強調表示
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <br>
+    <b>テーブル・ゲームランク・発掘スキル</b>
+    <br>
+    <table class="PARAM">
+        <tbody>
+        <tr>
+            <td>テーブルランク</td>
+            <td class="ROUNDT">
+                <select multiple="" name="TR">
+                    <option value="1">T1</option>
+                    <option value="2">T2</option>
+                    <option value="3">T3</option>
+                    <option value="4">T4</option>
+                    <option value="5">T5</option>
+                    <option value="6">T6</option>
+                    <option value="7">T7</option>
+                    <option value="8">T8</option>
+                    <option value="9">T9</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>ゲームランク</td>
+            <td class="ROUNDT">
+                <select multiple="" name="GR">
+                    <option value="0">R0</option>
+                    <option value="1">R1</option>
+                    <option value="2">R2</option>
+                    <option value="3">R3</option>
+                    <option value="4">R4</option>
+                    <option value="5">R5</option>
+                    <option value="6">R6</option>
+                    <option value="7">R7</option>
+                    <option value="8">R8</option>
+                    <option value="9">R9</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>発掘スキル</td>
+            <td class="ROUNDT">
+                <select multiple="" name="ES">
+                    <option value="1">S1</option>
+                    <option value="2">S2</option>
+                    <option value="3">S3</option>
+                    <option value="4">S4</option>
+                    <option value="5">S5</option>
+                </select>
+            </td>
+        </tbody>
+    </table>
+    <br>
+    <b>表示場所</b>
+    <br>
+    <input class="ROUND" type="text" name="BShousetsu" size="3" value="1" onchange="BHakuChange()">小節
+    <input class="ROUND" type="text" name="BHaku" size="3" value="1" onchange="BHakuChange()">拍
+    <br>=ID
+    <input class="ROUND" type="text" name="BID" size="4" value="0" onchange="BIDChange()">から
+    <br>
+    <input class="ROUND" type="text" name="BKosu" size="4" value="200">個表示
+    <br>
+    <br>
+    <input id="discard" type="checkbox" name="discard" value="0">入力したフォームを記憶しない
+    <br>
+    <br>
+    <input id="Go" class="Go" type="button" value="Go!">
+    <br>
+</form>
+<br>
+<script>
+    $(function () {
+        $('#country').change(function () {
+            // 北米版チェックボックスの設定確認
+            var prop = $('#country').prop('checked');
+            if (prop) {
+                //北米版ONなら「サブ左で金額表示」を隠す
+                $('.domestic').hide();
+            } else {
+                //そうでなければ表示
+                $('.domestic').show();
+            }
+        });
+    });
+
+
+    $(function () {
+        // LocalStorageの利用可否確認。使えなければ何もしない。
+        if (localStorage) {
+
+            // LocalStorageから履歴を取り出し
+            var myHistory = localStorage.getItem('jitenResume');
+            if (myHistory) {
+                setCondition(myHistory);
+            }
+            // イベントハンドラ追加
+            // Go!ボタンを押すとregisterHistoryが実行される
+            $('#Go').bind('click', registerHistory);
+        }
+    });
+
+    // Goをクリックでmodalの表示とメイン実行
+    $("#Go").click(function () {
+        if ($('[name="TR"]').val().length === 0) {
+            alert('テーブルを1つ以上選択してください。');
+        } else {
+            $('html', parent.document).append('<div id="modal" class="modal">ｲｸｿﾞｰ</div>');
+            main();
+        }
+    });
+</script>
+<hr>
+<br>本バージョンはクマーバロン様の許可を得て第三者が作成したものです。
+不具合報告、ご質問は製作者のTwitterまで <a href="http://twitter.com/RR_3323" target="_top">@RR_3323</a>
+</body>
+</html>
+
+
