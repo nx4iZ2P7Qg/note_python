@@ -35,9 +35,14 @@ def py_mv(target_dir, file_name, secret_index):
     :param secret_index: 车牌+索引
     :return: 无
     """
+    old_name = file_name
+    new_name = secret_index + file_name[file_name.rindex('.'):]
+    if old_name == new_name:
+        print(f"same file name, mv skip {file_name}")
+        return
     subprocess.run(['mv',
-                    target_dir + '/' + file_name,
-                    target_dir + '/' + secret_index + file_name[file_name.rindex('.'):]
+                    target_dir + '/' + old_name,
+                    target_dir + '/' + new_name
                     ])
 
 
@@ -106,30 +111,43 @@ def modify_mtime(target_dir, origin_file, modify_file):
                     ])
 
 
-def py_chmod(file):
+def py_chown(file):
     """
-    修改目录下所有文件权限
+    修改文件用户，组
 
-    :param target_dir: 指定目录
+    :param file: 指定文件
     :return: 无
     """
     subprocess.run(['chown', 'root:root', file])
 
 
-def get_pic_by_secret(secret, target_dir='.'):
+def py_chmod(file):
     """
-    根据车牌号获取相应图片
+    修改文件权限
+
+    :param file: 指定文件
+    :return: 无
+    """
+    subprocess.run(['chmod', '644', file])
+
+
+def get_pic_by_secret_mstage(secret, target_dir='.'):
+    """
+    根据车牌号获取相应图片，www.mgstage.com
 
     :param secret: 车牌号
     :param target_dir: 目录
-    :return: 无
+    :return: 0-正常，1-文件已存在
     """
     secret = secret.upper()
-    # 校验
+    if '-' not in secret:
+        raise Exception('not a valid secret, - not exist')
+    if os.path.exists(os.path.join(target_dir, f'{secret}.jpg')):
+        return 1
     split = secret.split('-')
-    if '-' not in secret or not split[0].isalnum() or not split[1].isdigit():
-        raise Exception('not a valid secret')
-    # 各网站路径，未来可能需要修改结构
+    if not split[0].isalnum() or not split[1].isdigit():
+        raise Exception('not a valid secret, secret split check fail')
+    # 各车牌路径，未来可能需要修改结构
     path_dict = {
         '259LUXU': 'luxutv',
         '261ARA': 'ara',
@@ -137,50 +155,101 @@ def get_pic_by_secret(secret, target_dir='.'):
         '300MIUM': 'prestigepremium',
         '300NTK': 'prestigepremium',
         '336KNB': 'kanbi',
+        'ABP': 'prestige',
+        'ABS': 'prestige',
     }
-    # 最终可能有效链接列表
     if split[0] in path_dict.keys():
-        split[0] = split[0].lower()
-        split[1] = split[1].lower()
-        secret = secret.lower()
         # 'https://image.mgstage.com/images      /luxutv               /259luxu   /1007/pb_e_259luxu-1007.jpg'
         # 'https://image.mgstage.com/images      /ara                  /261ara    /331 /pb_e_261ara-331.jpg'
         # 'https://image.mgstage.com/images      /prestigepremium      /300maan   /341 /pb_e_300maan-341.jpg'
-        link = f'https://image.mgstage.com/images/{path_dict[split[0]]}/{split[0]}/{split[1]}/pb_e_{secret}.jpg'
+        link = f'https://image.mgstage.com/images/{path_dict[split[0]]}/{split[0].lower()}/{split[1].lower()}' \
+            f'/pb_e_{secret.lower()}.jpg'
+        print(f'mstage-link = {link}')
+        headers = {
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
+        }
+        response = requests.get(link, headers=headers)
+        response.raise_for_status()
+        # 图片超过50KB被认为是有效图片
+        if len(response.content) > 50_000:
+            with open(f'{target_dir}/{secret}.jpg', 'wb') as jpg:
+                jpg.write(response.content)
+
+
+def get_pic_by_secret_dmm(secret, target_dir='.'):
+    """
+    根据车牌号获取相应图片，www.dmm.co.jp
+
+    :param secret: 车牌号
+    :param target_dir: 目录
+    :return: 0-正常，1-文件已存在
+    """
+    secret = secret.upper()
+    if '-' not in secret:
+        raise Exception('not a valid secret, - not exist')
+    if os.path.exists(os.path.join(target_dir, f'{secret}.jpg')):
+        return 1
+    split = secret.split('-')
+    if not split[0].isalnum() or not split[1].isdigit():
+        raise Exception('not a valid secret, secret split check fail')
+    temp = secret.replace('-', '').lower()
+    if split[0] in ['ABP']:
+        # 'https://pics.dmm.co.jp/mono/movie/adult/118abp627/118abp627pl.jpg'
+        link = f'https://pics.dmm.co.jp/mono/movie/adult/118{temp}/118{temp}pl.jpg'
+    elif split[0] in ['STARS']:
+        # https://pics.dmm.co.jp/mono/movie/adult/1stars103tk/1stars103tkpl.jpg
+        link = f'https://pics.dmm.co.jp/mono/movie/adult/1{temp}tk/1{temp}tkpl.jpg'
     else:
-        temp = secret.replace('-', '').lower()
         # 'https://pics.dmm.co.jp/mono/movie/adult/ipx232/ipx232pl.jpg'
         link = f'https://pics.dmm.co.jp/mono/movie/adult/{temp}/{temp}pl.jpg'
     headers = {
         'User-Agent':
             'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
     }
-    print(f'link 01 = {link}')
-    # 随机休眠
-    time.sleep(random.randint(6, 30) / 3)
+    print(f'dmm-link = {link}')
     response = requests.get(link, headers=headers)
     response.raise_for_status()
     # 图片超过50KB被认为是有效图片
     if len(response.content) > 50_000:
         with open(f'{target_dir}/{secret}.jpg', 'wb') as jpg:
             jpg.write(response.content)
-            return
-    # 少数图片以上地址缺少，比如WANZ-197，下面定义备用地址
+
+
+def get_pic_by_secret_javbus(secret, target_dir='.'):
+    """
+    根据车牌号获取相应图片，www.javbus.com
+
+    :param secret: 车牌号
+    :param target_dir: 目录
+    :return: 0-正常，1-文件已存在
+    """
+    secret = secret.upper()
+    if '-' not in secret:
+        raise Exception('not a valid secret, - not exist')
+    if os.path.exists(os.path.join(target_dir, f'{secret}.jpg')):
+        return 1
+    split = secret.split('-')
+    if not split[0].isalnum() or not split[1].isdigit():
+        raise Exception('not a valid secret, secret split check fail')
     bus_link = f'https://www.javbus.com/{secret}'
+    headers = {
+        'User-Agent':
+            'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
+    }
     response = requests.get(bus_link, headers=headers)
     html = response.content.decode('utf-8')
     # 多行匹配html
     pic_link = re.search('screencap.*<img src="(.*)" title=.*CC0000', html, flags=re.S)
     if pic_link:
         link = pic_link.group(1)
-    print(f'link 02 = {link}')
-    response = requests.get(link, headers=headers)
-    response.raise_for_status()
-    # 图片超过50KB被认为是有效图片
-    if len(response.content) > 50_000:
-        with open(f'{target_dir}/{secret}.jpg', 'wb') as jpg:
-            jpg.write(response.content)
-    raise Exception('can\'t find a matching jpg')
+        print(f'javbus-link = {link}')
+        response = requests.get(link, headers=headers)
+        response.raise_for_status()
+        # 图片超过50KB被认为是有效图片
+        if len(response.content) > 50_000:
+            with open(f'{target_dir}/{secret}.jpg', 'wb') as jpg:
+                jpg.write(response.content)
 
 
 def av_process(path=os.getcwd()):
@@ -197,20 +266,27 @@ def av_process(path=os.getcwd()):
     # 规范文件名
     normalize_file_name(path)
 
-    # 用set保存待下载车牌号，避免分段视频重复下载
+    # 用set保存待下载车牌号，避免分段视频重复下载，避免重复下载已存在的jpg
     secret_set = set()
     for file in os.listdir(path):
-        secret_set.add(extract_secret(file))
+        dot_index = file.rindex('.')
+        file_name = file[:dot_index]
+        # 文件不是jpg，且相应jpg文件不存在
+        if not file.endswith('jpg') and not os.path.exists(os.path.join(path, f'{file_name}.jpg')):
+            secret_set.add(extract_secret(file))
     print(f'secret_set = {secret_set}')
 
     print('start downloading pics')
     # 下载所有车牌对应的图片
     for secret in secret_set:
         try:
-            get_pic_by_secret(secret, target_dir=path)
+            get_pic_by_secret_mstage(secret, target_dir=path)
+            get_pic_by_secret_dmm(secret, target_dir=path)
+            get_pic_by_secret_javbus(secret, target_dir=path)
+            # # 随机休眠
+            # time.sleep(random.randint(6, 30) / 3)
         except Exception:
             print(f'get pic failed = {secret}')
-            continue
 
     print('start processing mtime')
     file_list = os.listdir(path)
@@ -223,6 +299,11 @@ def av_process(path=os.getcwd()):
     print('start processing user_group')
     for file in file_list:
         # 修改用户与组
+        py_chown(path + '/' + file)
+
+    print('start processing privilege')
+    for file in file_list:
+        # 修改权限
         py_chmod(path + '/' + file)
     print('finished')
 
