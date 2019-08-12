@@ -46,7 +46,8 @@ def text_ocr():
         pic = pic.resize((pic.width * 3, pic.height * 3), Image.ANTIALIAS)
         pic.save('z:/tmp/abc.jpg')
         pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
-        # text = pytesseract.image_to_string(pic, config='oem 2', lang='jpn')
+        # config = r'--psm 6'
+        # text = pytesseract.image_to_string(pic, lang='jpn', config=config)
         text = pytesseract.image_to_string(pic, lang='jpn')
         print(text)
 
