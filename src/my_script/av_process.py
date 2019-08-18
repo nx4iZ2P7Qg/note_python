@@ -17,7 +17,7 @@ def extract_secret(file_name):
     :param file_name: 含车牌的文件名串
     :return: 车牌
     """
-    secret_list = re.findall('([a-zA-Z0-9]{3,7}-[0-9]{3,4})', file_name)
+    secret_list = re.findall('([a-zA-Z0-9]{3,7}-[0-9]{3,5})', file_name)
     if len(secret_list) > 1:
         print(secret_list)
         raise Exception('找到多个车牌')
@@ -195,13 +195,22 @@ def get_pic_by_secret_dmm(secret, target_dir='.'):
         raise Exception('not a valid secret, secret split check fail')
     temp = secret.replace('-', '').lower()
     if split[0] in ['ABP']:
-        # 'https://pics.dmm.co.jp/mono/movie/adult/118abp627/118abp627pl.jpg'
+        #        https://pics.dmm.co.jp/mono/movie/adult/118abp627/118abp627pl.jpg
         link = f'https://pics.dmm.co.jp/mono/movie/adult/118{temp}/118{temp}pl.jpg'
+    elif split[0] in ['HODV']:
+        #        https://pics.dmm.co.jp/mono/movie/adult/41hodv21008/41hodv21008pl.jpg
+        link = f'https://pics.dmm.co.jp/mono/movie/adult/41{temp}/41{temp}pl.jpg'
+    elif split[0] in ['MDTM']:
+        #        https://pics.dmm.co.jp/mono/movie/84mdtm551r/84mdtm551rpl.jpg
+        link = f'https://pics.dmm.co.jp/mono/movie/84{temp}r/84{temp}rpl.jpg'
+    elif split[0] in ['SDAB']:
+        #        https://pics.dmm.co.jp/mono/movie/adult/1sdab104/1sdab104pl.jpg
+        link = f'https://pics.dmm.co.jp/mono/movie/adult/1{temp}/1{temp}pl.jpg'
     elif split[0] in ['STARS']:
-        # https://pics.dmm.co.jp/mono/movie/adult/1stars103tk/1stars103tkpl.jpg
+        #        https://pics.dmm.co.jp/mono/movie/adult/1stars103tk/1stars103tkpl.jpg
         link = f'https://pics.dmm.co.jp/mono/movie/adult/1{temp}tk/1{temp}tkpl.jpg'
     else:
-        # 'https://pics.dmm.co.jp/mono/movie/adult/ipx232/ipx232pl.jpg'
+        #        https://pics.dmm.co.jp/mono/movie/adult/ipx232/ipx232pl.jpg
         link = f'https://pics.dmm.co.jp/mono/movie/adult/{temp}/{temp}pl.jpg'
     headers = {
         'User-Agent':
@@ -269,10 +278,9 @@ def av_process(path=os.getcwd()):
     # 用set保存待下载车牌号，避免分段视频重复下载，避免重复下载已存在的jpg
     secret_set = set()
     for file in os.listdir(path):
-        dot_index = file.rindex('.')
-        file_name = file[:dot_index]
+        secret = extract_secret(file)
         # 文件不是jpg，且相应jpg文件不存在
-        if not file.endswith('jpg') and not os.path.exists(os.path.join(path, f'{file_name}.jpg')):
+        if not file.endswith('jpg') and not os.path.exists(os.path.join(path, f'{secret}.jpg')):
             secret_set.add(extract_secret(file))
     print(f'secret_set = {secret_set}')
 
