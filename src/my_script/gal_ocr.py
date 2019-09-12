@@ -22,9 +22,10 @@ nekopara_vol_2 = {
 # 窗口大小及位置默认
 evenicle_2 = {
     'title': 'イブニクル２',
-    'sub_area': [(526, 1227, 1826, 1477), (216, 1367, 2176, 1527)],
+    # 'sub_area': [(526, 1227, 1826, 1477)],
+    'sub_area': [(216, 1367, 2176, 1527)],
     'threshold': 100,
-    'resize': 0.24,
+    'resize': 0.26,
 }
 
 
@@ -50,7 +51,7 @@ def text_ocr(profile):
                 new_width = int(pic.width * size)
                 new_height = int(pic.height * size)
                 temp = pic.resize((new_width, new_height), Image.ANTIALIAS)
-                temp.save(f'z:/tmp/{area}_{size}.jpg')
+                temp.save(f'z:/tmp/ocr/{area}_{size}.jpg')
                 pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
                 config = r'--psm 3'
                 # config = r'--psm 6'
