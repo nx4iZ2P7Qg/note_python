@@ -9,6 +9,8 @@ import time
 
 import requests
 
+timeout = 5
+
 
 def extract_secret(file_name):
     """
@@ -17,13 +19,15 @@ def extract_secret(file_name):
     :param file_name: 含车牌的文件名串
     :return: 车牌
     """
-    secret_list = re.findall('([a-zA-Z0-9]{3,7}-[0-9]{3,5})', file_name)
+    secret_list = re.findall('([a-zA-Z0-9]{2,8}-[0-9]{3,5})', file_name)
     if len(secret_list) > 1:
         print(secret_list)
         raise Exception('找到多个车牌')
     if len(secret_list) < 1:
         raise Exception('找不到车牌')
-    return secret_list[0].upper()
+    secret = secret_list[0].upper()
+    print(f'secret extracted = {secret}')
+    return secret
 
 
 def py_mv(target_dir, file_name, secret_index):
@@ -55,22 +59,39 @@ def normalize_file_name(target_dir):
     """
     file_list = os.listdir(target_dir)
     for file in file_list:
+        # 若有多个-
+        if file.count('-') > 1:
+            print(f'multi - found in {file}')
+            # 将secret以外的-转换成_
+            secret = extract_secret(file)
+            tmp_str = 'SECRET'
+            tmp_name = file.replace(secret, tmp_str)
+            subprocess.run(['mv',
+                            target_dir + '/' + file,
+                            target_dir + '/' + tmp_name.replace('-', '_').replace(tmp_str, secret)
+                            ])
+            print(f'- in {file} converted')
+    # 重新获取文件列表
+    file_list = os.listdir(target_dir)
+    for file in file_list:
         print(f'processing file = {file}')
+        secret = extract_secret(file)
         i = 0
         split_flag = False
         for f in file_list:
-            # 开始到折线后4位相同，扩展名相同，认为是分段视频
-            if f.startswith(file[:file.rindex('-') + 4]) and f.endswith(file[file.rindex('.'):]):
+            # 文件名开始到secret后1位相同，或者secret后1位是.，同时扩展名相同，认为是分段视频
+            match_under = file[:file.index('-') + 1]
+            match_dot = file[:file.index('-')] + '.'
+            if (f.startswith(match_under) or f.startswith(match_dot)) and f.endswith(file[file.rindex('.'):]):
                 i += 1
         # 分段视频
         if i > 1:
             split_flag = True
         print(f'split_flag = {split_flag}')
-        secret = extract_secret(file)
-        print(f'secret extracted = {secret}')
         # 分段视频
         if split_flag:
-            if '_1.' in file or '_A.' in file or '_a.' in file:
+            # 没有_1, _A, _a，但确实是首段视频
+            if secret + '.' in file or '_1.' in file or '_A.' in file or '_a.' in file:
                 py_mv(target_dir, file, secret)
             elif '_2.' in file or '_B.' in file or '_b.' in file:
                 py_mv(target_dir, file, f'{secret}_2')
@@ -157,24 +178,27 @@ def get_pic_by_secret_mstage(secret, target_dir='.'):
         '336KNB': 'kanbi',
         'ABP': 'prestige',
         'ABS': 'prestige',
+        '314KIRAY': 'kiray'
     }
     if split[0] in path_dict.keys():
         # 'https://image.mgstage.com/images      /luxutv               /259luxu   /1007/pb_e_259luxu-1007.jpg'
         # 'https://image.mgstage.com/images      /ara                  /261ara    /331 /pb_e_261ara-331.jpg'
         # 'https://image.mgstage.com/images      /prestigepremium      /300maan   /341 /pb_e_300maan-341.jpg'
+        # 'https://image.mgstage.com/images      /kiray                /314kiray  /096 /pb_e_314kiray-096.jpg'
         link = f'https://image.mgstage.com/images/{path_dict[split[0]]}/{split[0].lower()}/{split[1].lower()}' \
             f'/pb_e_{secret.lower()}.jpg'
-        print(f'mstage-link = {link}')
+        print(f'get_pic_by_secret_mstage-link = {link}')
         headers = {
             'User-Agent':
                 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
         }
-        response = requests.get(link, headers=headers)
-        response.raise_for_status()
+        response = requests.get(link, headers=headers, timeout=timeout)
         # 图片超过50KB被认为是有效图片
         if len(response.content) > 50_000:
             with open(f'{target_dir}/{secret}.jpg', 'wb') as jpg:
                 jpg.write(response.content)
+    else:
+        print('get_pic_by_secret_mstage-link not a mstage link')
 
 
 def get_pic_by_secret_dmm(secret, target_dir='.'):
@@ -216,9 +240,8 @@ def get_pic_by_secret_dmm(secret, target_dir='.'):
         'User-Agent':
             'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
     }
-    print(f'dmm-link = {link}')
-    response = requests.get(link, headers=headers)
-    response.raise_for_status()
+    print(f'get_pic_by_secret_dmm-link = {link}')
+    response = requests.get(link, headers=headers, timeout=timeout)
     # 图片超过50KB被认为是有效图片
     if len(response.content) > 50_000:
         with open(f'{target_dir}/{secret}.jpg', 'wb') as jpg:
@@ -246,19 +269,21 @@ def get_pic_by_secret_javbus(secret, target_dir='.'):
         'User-Agent':
             'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
     }
-    response = requests.get(bus_link, headers=headers)
+    print(f'get_pic_by_secret_javbus-bus_link = {bus_link}')
+    response = requests.get(bus_link, headers=headers, timeout=timeout)
     html = response.content.decode('utf-8')
     # 多行匹配html
     pic_link = re.search('screencap.*<img src="(.*)" title=.*CC0000', html, flags=re.S)
     if pic_link:
         link = pic_link.group(1)
-        print(f'javbus-link = {link}')
-        response = requests.get(link, headers=headers)
-        response.raise_for_status()
+        print(f'get_pic_by_secret_javbus-link = {link}')
+        response = requests.get(link, headers=headers, timeout=timeout)
         # 图片超过50KB被认为是有效图片
         if len(response.content) > 50_000:
             with open(f'{target_dir}/{secret}.jpg', 'wb') as jpg:
                 jpg.write(response.content)
+    else:
+        print(f'get_pic_by_secret_javbus-link re search failed')
 
 
 def av_process(path=os.getcwd()):
@@ -281,20 +306,24 @@ def av_process(path=os.getcwd()):
         secret = extract_secret(file)
         # 文件不是jpg，且相应jpg文件不存在
         if not file.endswith('jpg') and not os.path.exists(os.path.join(path, f'{secret}.jpg')):
-            secret_set.add(extract_secret(file))
+            secret_set.add(secret)
     print(f'secret_set = {secret_set}')
 
     print('start downloading pics')
     # 下载所有车牌对应的图片
     for secret in secret_set:
         try:
+            print('call mstage')
             get_pic_by_secret_mstage(secret, target_dir=path)
+            print('call dmm')
             get_pic_by_secret_dmm(secret, target_dir=path)
+            print('call javbus')
             get_pic_by_secret_javbus(secret, target_dir=path)
             # # 随机休眠
             # time.sleep(random.randint(6, 30) / 3)
-        except Exception:
+        except Exception as e:
             print(f'get pic failed = {secret}')
+            print(e)
 
     print('start processing mtime')
     file_list = os.listdir(path)
