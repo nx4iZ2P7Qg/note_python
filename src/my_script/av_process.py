@@ -29,24 +29,22 @@ def extract_secret(file_name):
     return secret
 
 
-def py_mv(target_dir, file_name, secret_index):
+def py_mv(target_dir, old_name, new_name):
     """
     修改文件名
 
     :param target_dir: 指定目录
-    :param file_name: 源文件名
-    :param secret_index: 车牌+索引
+    :param old_name: 旧文件名
+    :param new_name: 新文件名
     :return: 无
     """
-    old_name = file_name
-    new_name = secret_index + file_name[file_name.rindex('.'):]
     if old_name == new_name:
-        print(f"same file name, mv skip {file_name}")
+        print(f"same {new_name}, skip mv")
         return
     subprocess.run(['mv',
                     '-i',
-                    target_dir + '/' + old_name,
-                    target_dir + '/' + new_name
+                    os.path.join(target_dir, old_name),
+                    os.path.join(target_dir, new_name)
                     ])
 
 
@@ -59,59 +57,66 @@ def normalize_file_name(target_dir):
     """
     file_list = os.listdir(target_dir)
     # 去除jpg文件
-    file_list = [x for x in file_list if not x.endswith('.jpg')]
-    for file in file_list:
-        # 若有多个-
+    file_list_video = [x for x in file_list if not x.endswith('.jpg')]
+    # 处理多个-
+    for file in file_list_video:
         if file.count('-') > 1:
-            print(f'multi - found in {file}')
-            # 将secret以外的-转换成_
+            # 将secret以外的-转换成_，尤其是-1, -2这种分段文件
             secret = extract_secret(file)
             secret_index = file.upper().index(secret)
-            pre = file[:secret_index].replace('-', '')
-            post = file[secret_index + len(secret):].replace('-', '')
-            subprocess.run(['mv',
-                            target_dir + '/' + file,
-                            target_dir + '/' + pre + file[secret_index: secret_index + len(secret)] + post
-                            ])
+            new_file = file[:secret_index].replace('-', '_') \
+                       + file[secret_index: secret_index + len(secret)] \
+                       + file[secret_index + len(secret):].replace('-', '_')
+            py_mv(target_dir, file, new_file)
+            print(f'multi - found in {file}, rename to {new_file}')
+    # 重命名后再次初始化文件列表
+    file_list = os.listdir(target_dir)
+    # 去除jpg文件
+    file_list_video = [x for x in file_list if not x.endswith('.jpg')]
     # 统计分段文件secret
-    split_secret = {}
-    for file in file_list:
+    secret_count = {}
+    for file in file_list_video:
         secret = extract_secret(file)
-        if secret not in split_secret:
-            split_secret[secret] = 1
+        if secret not in secret_count:
+            secret_count[secret] = 1
         else:
-            split_secret[secret] += 1
-    print(f'split_secret = {split_secret}')
+            secret_count[secret] += 1
+    print(f'split_secret = {secret_count}')
+    proceed = input('proceed ? y / n ')
+    if proceed != 'y':
+        sys.exit()
+    # jpg文件转大写也走此流程
     for file in file_list:
-        print(f'processing file = {file}')
+        ext = file[file.rindex('.'):]
         secret = extract_secret(file)
         # 分段视频
-        if split_secret[secret] > 1:
+        if secret_count[secret] > 1:
             if '_1.' in file or '_A.' in file or '_a.' in file:
-                py_mv(target_dir, file, secret)
+                new_name = secret
             elif '_2.' in file or '_B.' in file or '_b.' in file:
-                py_mv(target_dir, file, f'{secret}_2')
+                new_name = f'{secret}_2'
             elif '_3.' in file or '_C.' in file or '_c.' in file:
-                py_mv(target_dir, file, f'{secret}_3')
+                new_name = f'{secret}_3'
             elif '_4.' in file or '_D.' in file or '_d.' in file:
-                py_mv(target_dir, file, f'{secret}_4')
+                new_name = f'{secret}_4'
             elif '_5.' in file or '_E.' in file or '_e.' in file:
-                py_mv(target_dir, file, f'{secret}_5')
+                new_name = f'{secret}_5'
             elif '_6.' in file or '_F.' in file or '_f.' in file:
-                py_mv(target_dir, file, f'{secret}_6')
+                new_name = f'{secret}_6'
             elif '_7.' in file or '_G.' in file or '_g.' in file:
-                py_mv(target_dir, file, f'{secret}_7')
+                new_name = f'{secret}_7'
             elif '_8.' in file or '_H.' in file or '_h.' in file:
-                py_mv(target_dir, file, f'{secret}_8')
+                new_name = f'{secret}_8'
             elif '_9.' in file or '_I.' in file or '_i.' in file:
-                py_mv(target_dir, file, f'{secret}_9')
+                new_name = f'{secret}_9'
             # 没有标注认为是第一段
             else:
                 print('_x not matched, processed as first')
-                py_mv(target_dir, file, secret)
+                new_name = secret
+            py_mv(target_dir, file, new_name + ext)
         # 非分段视频
         else:
-            py_mv(target_dir, file, secret)
+            py_mv(target_dir, file, secret + ext)
 
 
 def modify_mtime(target_dir, origin_file, modify_file):
@@ -125,8 +130,8 @@ def modify_mtime(target_dir, origin_file, modify_file):
     """
     subprocess.run(['touch',
                     '-r',
-                    target_dir + '/' + origin_file,
-                    target_dir + '/' + modify_file
+                    os.path.join(target_dir, origin_file),
+                    os.path.join(target_dir, modify_file)
                     ])
 
 
@@ -156,7 +161,7 @@ def get_pic_by_secret_mstage(secret, target_dir='.'):
 
     :param secret: 车牌号
     :param target_dir: 目录
-    :return: 0-正常，1-文件已存在
+    :return: 0-正常
     """
     secret = secret.upper()
     if '-' not in secret:
@@ -184,7 +189,7 @@ def get_pic_by_secret_mstage(secret, target_dir='.'):
         # 'https://image.mgstage.com/images      /prestigepremium      /300maan   /341 /pb_e_300maan-341.jpg'
         # 'https://image.mgstage.com/images      /kiray                /314kiray  /096 /pb_e_314kiray-096.jpg'
         link = f'https://image.mgstage.com/images/{path_dict[split[0]]}/{split[0].lower()}/{split[1].lower()}' \
-            f'/pb_e_{secret.lower()}.jpg'
+               f'/pb_e_{secret.lower()}.jpg'
         print(f'get_pic_by_secret_mstage-link = {link}')
         headers = {
             'User-Agent':
@@ -193,7 +198,7 @@ def get_pic_by_secret_mstage(secret, target_dir='.'):
         response = requests.get(link, headers=headers, timeout=timeout)
         # 图片超过50KB被认为是有效图片
         if len(response.content) > 50_000:
-            with open(f'{target_dir}/{secret}.jpg', 'wb') as jpg:
+            with open(os.path.join(target_dir, f'{secret}.jpg'), 'wb') as jpg:
                 jpg.write(response.content)
     else:
         raise Exception('get_pic_by_secret_mstage-link not a mstage link')
@@ -205,7 +210,7 @@ def get_pic_by_secret_dmm(secret, target_dir='.'):
 
     :param secret: 车牌号
     :param target_dir: 目录
-    :return: 0-正常，1-文件已存在
+    :return: 0-正常
     """
     secret = secret.upper()
     if '-' not in secret:
@@ -242,7 +247,7 @@ def get_pic_by_secret_dmm(secret, target_dir='.'):
     response = requests.get(link, headers=headers, timeout=timeout)
     # 图片超过50KB被认为是有效图片
     if len(response.content) > 50_000:
-        with open(f'{target_dir}/{secret}.jpg', 'wb') as jpg:
+        with open(os.path.join(target_dir, f'{secret}.jpg'), 'wb') as jpg:
             jpg.write(response.content)
 
 
@@ -252,7 +257,7 @@ def get_pic_by_secret_javbus(secret, target_dir='.'):
 
     :param secret: 车牌号
     :param target_dir: 目录
-    :return: 0-正常，1-文件已存在
+    :return: 0-正常
     """
     secret = secret.upper()
     if '-' not in secret:
@@ -278,7 +283,7 @@ def get_pic_by_secret_javbus(secret, target_dir='.'):
         response = requests.get(link, headers=headers, timeout=timeout)
         # 图片超过50KB被认为是有效图片
         if len(response.content) > 50_000:
-            with open(f'{target_dir}/{secret}.jpg', 'wb') as jpg:
+            with open(os.path.join(target_dir, f'{secret}.jpg'), 'wb') as jpg:
                 jpg.write(response.content)
     else:
         print(f'get_pic_by_secret_javbus-link re search failed')
@@ -304,7 +309,6 @@ def av_process(path=os.getcwd()):
     secret_set = set()
     for file in os.listdir(path):
         secret = extract_secret(file)
-        print(f'secret extracted = {secret}')
         # 文件不是jpg，且相应jpg文件不存在
         if not file.endswith('jpg') and not os.path.exists(os.path.join(path, f'{secret}.jpg')):
             secret_set.add(secret)
@@ -343,18 +347,18 @@ def av_process(path=os.getcwd()):
     for file in file_list:
         for f in file_list:
             # 修改分段非首段，及.jpg文件的mtime
-            if f.startswith(file[:file.rindex('.')]):
+            if file != f and f.startswith(file[:file.rindex('.')]):
                 modify_mtime(path, file, f)
 
     print('------- user_group start -------')
     for file in file_list:
         # 修改用户与组
-        py_chown(path + '/' + file)
+        py_chown(os.path.join(path, file))
 
     print('------- privilege start -------')
     for file in file_list:
         # 修改权限
-        py_chmod(path + '/' + file)
+        py_chmod(os.path.join(path, file))
     print('------- finished -------')
 
 
