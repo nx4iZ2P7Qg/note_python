@@ -172,24 +172,20 @@ def get_pic_by_secret_mstage(secret, target_dir='.'):
     if not split[0].isalnum() or not split[1].isdigit():
         raise Exception('not a valid secret, secret split check fail')
     # 各车牌路径，未来可能需要修改结构
-    path_dict = {
-        '259LUXU': 'luxutv',
-        '261ARA': 'ara',
-        '300MAAN': 'prestigepremium',
-        '300MIUM': 'prestigepremium',
-        '300NTK': 'prestigepremium',
-        '336KNB': 'kanbi',
-        'ABP': 'prestige',
-        'ABS': 'prestige',
-        '314KIRAY': 'kiray'
+    meta = {
+        '259LUXU': {'s1': 'luxutv'},
+        '261ARA': {'s1': 'ara'},
+        '300MAAN': {'s1': 'prestigepremium'},
+        '300MIUM': {'s1': 'prestigepremium'},
+        '300NTK': {'s1': 'prestigepremium'},
+        '336KNB': {'s1': 'kanbi'},
+        'ABP': {'s1': 'prestige'},
+        'ABS': {'s1': 'prestige'},
+        '314KIRAY': {'s1': 'kiray'}
     }
-    if split[0] in path_dict.keys():
-        # 'https://image.mgstage.com/images      /luxutv               /259luxu   /1007/pb_e_259luxu-1007.jpg'
-        # 'https://image.mgstage.com/images      /ara                  /261ara    /331 /pb_e_261ara-331.jpg'
-        # 'https://image.mgstage.com/images      /prestigepremium      /300maan   /341 /pb_e_300maan-341.jpg'
-        # 'https://image.mgstage.com/images      /kiray                /314kiray  /096 /pb_e_314kiray-096.jpg'
-        link = f'https://image.mgstage.com/images/{path_dict[split[0]]}/{split[0].lower()}/{split[1].lower()}' \
-               f'/pb_e_{secret.lower()}.jpg'
+    if split[0] in meta.keys():
+        s1 = meta[split[0]]['s1']
+        link = f'https://image.mgstage.com/images/{s1}/{split[0].lower()}/{split[1]}/pb_e_{secret.lower()}.jpg'
         print(f'get_pic_by_secret_mstage-link = {link}')
         headers = {
             'User-Agent':
@@ -223,23 +219,20 @@ def get_pic_by_secret_dmm(secret, target_dir='.'):
     if not split[0].isalnum() or not split[1].isdigit():
         raise Exception('not a valid secret, secret split check fail')
     temp = secret.replace('-', '').lower()
-    if split[0] in ['ABP']:
-        #        https://pics.dmm.co.jp/mono/movie/adult/118abp627/118abp627pl.jpg
-        link = f'https://pics.dmm.co.jp/mono/movie/adult/118{temp}/118{temp}pl.jpg'
-    elif split[0] in ['HODV']:
-        #        https://pics.dmm.co.jp/mono/movie/adult/41hodv21008/41hodv21008pl.jpg
-        link = f'https://pics.dmm.co.jp/mono/movie/adult/41{temp}/41{temp}pl.jpg'
-    elif split[0] in ['MDTM']:
-        #        https://pics.dmm.co.jp/mono/movie/84mdtm551r/84mdtm551rpl.jpg
-        link = f'https://pics.dmm.co.jp/mono/movie/84{temp}r/84{temp}rpl.jpg'
-    elif split[0] in ['SDAB']:
-        #        https://pics.dmm.co.jp/mono/movie/adult/1sdab104/1sdab104pl.jpg
-        link = f'https://pics.dmm.co.jp/mono/movie/adult/1{temp}/1{temp}pl.jpg'
-    elif split[0] in ['STARS']:
-        #        https://pics.dmm.co.jp/mono/movie/adult/1stars103tk/1stars103tkpl.jpg
-        link = f'https://pics.dmm.co.jp/mono/movie/adult/1{temp}tk/1{temp}tkpl.jpg'
+    meta = {
+        'ABP': {'s1': '/adult/118', 's2': '/118', 's3': 'pl'},
+        'GAOR': {'s1': '/adult/', 's2': 'so/', 's3': 'sopl'},
+        'HODV': {'s1': '/adult/41', 's2': '/41', 's3': 'pl'},
+        'MDTM': {'s1': '/84', 's2': 'r/84', 's3': 'rpl'},
+        'SDAB': {'s1': '/adult/1', 's2': '/1', 's3': 'pl'},
+        'STARS': {'s1': '/adult/1', 's2': 'tk/1', 's3': 'tkpl'}
+    }
+    if split[0] in meta.keys():
+        s1 = meta[split[0]]['s1']
+        s2 = meta[split[0]]['s2']
+        s3 = meta[split[0]]['s3']
+        link = f'https://pics.dmm.co.jp/mono/movie{s1}{temp}{s2}{temp}{s3}.jpg'
     else:
-        #        https://pics.dmm.co.jp/mono/movie/adult/ipx232/ipx232pl.jpg
         link = f'https://pics.dmm.co.jp/mono/movie/adult/{temp}/{temp}pl.jpg'
     headers = {
         'User-Agent':
