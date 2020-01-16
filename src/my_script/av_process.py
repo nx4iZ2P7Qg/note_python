@@ -200,8 +200,10 @@ def get_pic_by_secret_mstage(secret, target_dir='.'):
         if len(response.content) > 50_000:
             with open(os.path.join(target_dir, f'{secret}.jpg'), 'wb') as jpg:
                 jpg.write(response.content)
+        else:
+            raise Exception('file size not correct')
     else:
-        raise Exception('get_pic_by_secret_mstage-link not a mstage link')
+        raise Exception('not a mstage link')
 
 
 def get_pic_by_secret_dmm(secret, target_dir='.'):
@@ -249,6 +251,8 @@ def get_pic_by_secret_dmm(secret, target_dir='.'):
     if len(response.content) > 50_000:
         with open(os.path.join(target_dir, f'{secret}.jpg'), 'wb') as jpg:
             jpg.write(response.content)
+    else:
+        raise Exception('file size not correct')
 
 
 def get_pic_by_secret_javbus(secret, target_dir='.'):
@@ -285,8 +289,10 @@ def get_pic_by_secret_javbus(secret, target_dir='.'):
         if len(response.content) > 50_000:
             with open(os.path.join(target_dir, f'{secret}.jpg'), 'wb') as jpg:
                 jpg.write(response.content)
+        else:
+            raise Exception('file size not correct')
     else:
-        print(f'get_pic_by_secret_javbus-link re search failed')
+        raise Exception(f'get_pic_by_secret_javbus-link re search failed')
 
 
 def av_process(path=os.getcwd()):
