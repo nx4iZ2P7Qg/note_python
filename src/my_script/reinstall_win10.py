@@ -20,6 +20,7 @@ PATH_FIREFOX_DEVELOPER = 'C:/Users/DF/AppData/Roaming/Mozilla/Firefox/Profiles/'
 # intellij idea community edition
 # intellij pycharm community edition
 # postman请求
+# postgres
 
 
 # ============================== 游戏 ==============================
