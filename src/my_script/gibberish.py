@@ -1,5 +1,5 @@
 """
-big5，双字节编码
+乱码问题的根源，字符编码成字节后，使用另一种编码读取成字符
 """
 
 # 解释三国类游戏乱码的问题
@@ -21,3 +21,7 @@ temp = big5_char.encode('big5')
 # 在简体操作系统中，会以gbk编码来读取游戏文件
 temp = temp.decode('gbk')
 print(temp)
+
+# 常用编码参考
+# 日文    SHIFT_JIS
+# 台湾    big5
