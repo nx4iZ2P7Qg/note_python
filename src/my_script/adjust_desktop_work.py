@@ -21,7 +21,7 @@ def adjust_desktop():
             win.left = 80
             win.top = 0
             win.width = middle_width - win.left - 20
-            win.height = middle_height
+            win.height = middle_height + 300
         # 文件浏览器，this pc页面
         elif 'This PC' in win.title:
             win.left = 80
