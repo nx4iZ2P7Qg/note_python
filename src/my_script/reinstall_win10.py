@@ -21,27 +21,13 @@ PATH_FIREFOX_DEVELOPER = 'C:/Users/DF/AppData/Roaming/Mozilla/Firefox/Profiles/'
 # intellij pycharm community edition
 # postman请求
 # postgres
+# visual studio code
+PATH_VISUAL_STUDIO_CODE = 'C:/Users/DF/AppData/Roaming/Code'
 
+# tampermonkey
+# Google Hit Hider by Domain 域名列表
 
-# ============================== 游戏 ==============================
-# 夏娃年代记 哈尼喵汉化组
-PATH_EVENICLE = 'C:/Users/DF/Documents/AliceSoft/夏娃年代记汉化版V1.00【哈尼喵汉化组】 此汉化免费发布，若是花了钱，请去退货退款给差评/'
-# FF12 CPY
-PATH_FFXII = 'C:/Users/DF/Documents/My Games/FINAL FANTASY XII THE ZODIAC AGE/'
-# 上古卷轴5 天际
-PATH_THE_ELDER_SCROLLS_V_SKYRIM = 'C:/Users/DF/Documents/My Games/Skyrim Special Edition/'
-# FFVIII STEAM FLT
-PATH_FFVIII = 'C:/Users/DF/Documents/Square Enix/FINAL FANTASY VIII Steam/'
-# 生化危机4 终极高清版 3DM
-PATH_RE4 = 'C:/ProgramData/Steam/3DMGAME/254700/'
-# 怪物猎人世界 CODEX
-PATH_MHW = 'C:/Users/Public/Documents/Steam/CODEX/582010/'
-# 生化危机2 重制版 CODEX
-PATH_RE2_RE = 'C:/Users/Public/Documents/Steam/CODEX/883710/'
-# vr女友 DARKSIDERS
-PATH_VR_KANOJO = 'D:/games/VR Kanojo/UserData/'
-# honey select zod
-PATH_HONEY_SELECT = 'D:/games/HoneySelect/UserData/'
+# 常驻 game 数据
 
 # ============================== 模拟器 ==============================
 # dolphin
@@ -55,16 +41,6 @@ PATH_WORK_DOCUMENT = 'D:/backup/'
 back_up_tuple_desktop = {
     PATH_FILEZILLA,
     PATH_OBS,
-
-    PATH_EVENICLE,
-    PATH_FFXII,
-    PATH_THE_ELDER_SCROLLS_V_SKYRIM,
-    PATH_FFVIII,
-    PATH_RE4,
-    PATH_MHW,
-    PATH_RE2_RE,
-    PATH_VR_KANOJO,
-    PATH_HONEY_SELECT,
 
     PATH_DOLPHIN_CONFIG,
     PATH_DOLPHIN_SCREENSHOTS,
