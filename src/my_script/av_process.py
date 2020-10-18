@@ -221,6 +221,7 @@ def get_pic_by_secret_dmm(secret, target_dir='.'):
     temp = secret.replace('-', '').lower()
     meta = {
         'ABP': {'s1': '/adult/118', 's2': '/118', 's3': 'pl'},
+        'FSDSS': {'s1': '/adult/1', 's2': '/1', 's3': 'pl'},
         'GAOR': {'s1': '/adult/', 's2': 'so/', 's3': 'sopl'},
         'HODV': {'s1': '/adult/41', 's2': '/41', 's3': 'pl'},
         'MDTM': {'s1': '/84', 's2': 'r/84', 's3': 'rpl'},
