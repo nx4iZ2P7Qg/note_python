@@ -6,7 +6,8 @@ from PIL import Image
 # 1600 * 900
 nekopara_vol_1 = {
     'title': 'ネコぱら vol.1',
-    'sub_area': [(326, 787, 1316, 937), (326, 827, 1316, 977)],
+    'sub_area': [(326, 787, 1316, 937)],
+    # 'sub_area': [(326, 827, 1316, 977)],
     'threshold': 210,
     'resize': 0.3,
 }
@@ -28,12 +29,23 @@ evenicle_2 = {
     'resize': 0.26,
 }
 
+sabbatOfTheWitch = {
+'title': 'サノバウィッチ',
+    # 'sub_area': [(526, 1227, 1826, 1477)],
+    # 'sub_area': [(216, 1367, 2176, 1527)],
+    'sub_area': [(390, 802, 1326, 937)],
+    'threshold': 100,
+    'resize': 0.25,
+}
+
 
 def text_ocr(profile):
     # print(pyautogui.getAllTitles())
     win_list = pyautogui.getWindowsWithTitle(profile['title'])
     if len(win_list) != 1:
         print('window not unique')
+        for win in win_list:
+            print(win.title)
         return -1
     for win in win_list:
         win.activate()
@@ -51,7 +63,8 @@ def text_ocr(profile):
                 new_width = int(pic.width * size)
                 new_height = int(pic.height * size)
                 temp = pic.resize((new_width, new_height), Image.ANTIALIAS)
-                temp.save(f'z:/tmp/ocr/{area}_{size}.jpg')
+                # temp.save(f'z:/tmp/ocr/{area}_{size}.jpg')
+                # temp.save(f'z:/tmp/ocr/{size}.jpg')
                 pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
                 config = r'--psm 3'
                 # config = r'--psm 6'
@@ -59,4 +72,4 @@ def text_ocr(profile):
                 print(f'{text}\n')
 
 
-text_ocr(evenicle_2)
+text_ocr(nekopara_vol_1)
