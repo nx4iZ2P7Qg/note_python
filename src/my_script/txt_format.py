@@ -25,60 +25,53 @@ def get_width(o):
 def txt_format(file_path):
     with open(file_path, 'r', encoding='utf-8') as origin:
         lines = origin.readlines()
+    line_count = len(lines)
 
-    # 首先统计出二维数组列数
-    # 2个以上空格分割字段
-    split_str = ' {2,}'
-    # 待统计列数，不含最后一列
-    cols_count = len(re.split(split_str, lines[0])) - 1
-    # 定义字段二维数组
-    width_arr = [[0 for i in range(len(lines))] for j in range(cols_count)]
+    # 2个以上空格，一个或多个制表
+    split_str = ' {2,}|\t+'
 
-    # 统计每行各字段值最大宽度，并放入二维数组
-    for i in range(len(lines)):
-        if lines[i] == '\n':
-            continue
-        cols = re.split(split_str, lines[i])
-        for j in range(cols_count):
-            col = cols[j]
+    # 各行各列宽度
+    txt_width_arr = []
+    # 各列最大宽度
+    col_max_len_map = {}
+    for i in range(line_count):
+        lines[i] = lines[i].strip()
+        line_arr = re.split(split_str, lines[i])
+        txt_width = {}
+        for j in range(len(line_arr)):
+            col = line_arr[j]
             # 字体的宽度
             col_len = 0
             for char in col:
                 col_len += get_width(ord(char))
-            width_arr[j][i] = col_len
+            txt_width[j] = col_len
+            if j in col_max_len_map:
+                if col_max_len_map[j] <= col_len:
+                    col_max_len_map[j] = col_len
+            else:
+                col_max_len_map[j] = col_len
+        txt_width_arr.append(txt_width)
 
-    # 统计各列最大宽度
-    max_width_arr = []
-    for array in width_arr:
-        max_width_arr.append(max(array))
-    print(f'max_width_arr = {max_width_arr}')
-
-    # 计算各列起始点
-    # 定义soft tab长度
+    # 计算各列起始点为 tab 的倍数
     tab_len = 4
-    # 第一列起点为0
-    start_arr = [0]
-    for i in range(len(max_width_arr)):
-        for j in range(100):
-            if start_arr[i] + max_width_arr[i] < j * tab_len:
-                start_arr.append(j * tab_len)
-                break
-    print(f'start_arr = {start_arr}')
+    col_location_map = {}
+    for k in col_max_len_map:
+        v = col_max_len_map[k]
+        # 防止字段间只隔1个空格引起歧义
+        if v % tab_len == tab_len - 1:
+            col_location_map[k] = v + 1 + tab_len
+        else:
+            col_location_map[k] = v + (tab_len - v % tab_len)
 
-    # 将内容按start_arr填充到文件
+    # 填充行
     with open(f'{file_path}_format.txt', 'w', encoding='utf-8') as new:
-        for i in range(len(lines)):
-            if lines[i] == '\n':
-                new.write(lines[i])
-                continue
-            cols = re.split(split_str, lines[i])
-            for j in range(len(cols)):
-                # 最后一列
-                if j == len(cols) - 1:
-                    new.write(cols[j])
-                else:
-                    # 补充空格
-                    new.write(cols[j] + ' ' * (start_arr[j + 1] - start_arr[j] - width_arr[j][i]))
+        for i in range(line_count):
+            line_arr = re.split(split_str, lines[i])
+            for j in range(len(line_arr)):
+                if j != 0:
+                    new.write(' ' * (col_location_map[j - 1] - txt_width_arr[i][j - 1]))
+                new.write(line_arr[j])
+            new.write('\n')
 
 
-txt_format('d:/desktop/item.txt')
+txt_format('D:\\tmp.txt')
