@@ -18,11 +18,17 @@ def adjust_desktop():
         # 全屏
         if '- Mozilla Thunderbird' in win.title:
             win.maximize()
-        # 左上
+        # # 左上
+        # elif 'Firefox Developer Edition' in win.title:
+        #     win.left = 80
+        #     win.top = 0
+        #     win.width = middle_width - win.left
+        #     win.height = middle_height
+        # 居中
         elif 'Firefox Developer Edition' in win.title:
-            win.left = 80
-            win.top = 0
-            win.width = middle_width - win.left
+            win.left = (screen_width - middle_width) / 2
+            win.top = (screen_height - middle_height) / 2
+            win.width = middle_width
             win.height = middle_height
         # 左下
         elif ' PyCharm' in win.title or '- PyCharm' in win.title:
@@ -60,7 +66,8 @@ def adjust_desktop():
             win.width = middle_width - 200
             win.height = middle_height - 120
         # 左下，远程连接
-        elif '- Remote Desktop Connection' in win.title:
+        elif '- Remote Desktop Connection' in win.title or \
+                'SumatraPDF' in win.title:
             win.left = 0
             win.top = middle_height - 66
         # im
