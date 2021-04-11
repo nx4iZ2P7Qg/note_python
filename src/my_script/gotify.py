@@ -1,5 +1,6 @@
 import subprocess
 import requests
+import datetime
 
 smart_file = '/var/log/daemon.log'
 smart_token = 'A61-EfaWFIMejMf'
@@ -27,7 +28,7 @@ def grep_str_in_file(string, file):
 
 
 def send_to_gotify(url, message):
-    data = {'title': '硬盘关键 smart', 'message': f'{message}', 'priority': '10'}
+    data = {'title': 'key smart', 'message': f'{message}', 'priority': '10'}
     requests.post(f'{url}', data=data, verify=False)
 
 
@@ -35,6 +36,22 @@ for attribute in attributes:
     c, m = grep_str_in_file(attribute, smart_file)
     if c == 0:
         line_arr = m.decode('utf-8').split('\n')
+        # 保留30分钟内的消息
+        re_arr = []
+        for line in line_arr:
+            if len(line) == 0:
+                continue
+            i = str(line).index(':', 10)
+            h = line[i - 2: i]
+            m = line[i + 1: i + 3]
+            # 计算分钟
+            minute = int(h) * 60 + int(m)
+            now = datetime.datetime.now().hour * 60 + datetime.datetime.now().minute
+            print(minute)
+            print(now)
+            if now - minute <= 30:
+                re_arr.append(line)
         # 最后一个元素是 ''，输出最后一个有意义的行
-        m = line_arr[-2]
-        send_to_gotify(smart_url, m)
+        if len(re_arr) > 0:
+            m = re_arr[-1]
+            send_to_gotify(smart_url, m)
