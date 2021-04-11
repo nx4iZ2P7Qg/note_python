@@ -24,7 +24,9 @@ def grep_str_in_file(string, file):
             return 1, "找不到相关条目"
         else:
             return e.returncode, e
-    return 0, grep_result
+    message_arr = grep_result.decode('utf-8').split('\n')
+    message_arr = [x for x in message_arr if len(x) != 0]
+    return 0, message_arr
 
 
 def send_to_gotify(url, message):
@@ -32,26 +34,30 @@ def send_to_gotify(url, message):
     requests.post(f'{url}', data=data, verify=False)
 
 
+def filter_message(message_arr):
+    filter_arr = []
+    for line in message_arr:
+        i = str(line).index(' ')
+        d = line[i + 1: i + 3]
+        h = line[i + 4: i + 6]
+        m = line[i + 7: i + 9]
+        now = datetime.datetime.now()
+        # 保留今天的数据
+        if int(d) != now.day:
+            continue
+        # 计算分钟
+        minute_log = int(h) * 60 + int(m)
+        minute_now = now.hour * 60 + now.minute
+        if minute_now - minute_log <= 30:
+            # 保留30分钟内的消息
+            filter_arr.append(line)
+    return filter_arr
+
+
 for attribute in attributes:
-    c, m = grep_str_in_file(attribute, smart_file)
+    c, arr = grep_str_in_file(attribute, smart_file)
     if c == 0:
-        line_arr = m.decode('utf-8').split('\n')
-        # 保留30分钟内的消息
-        re_arr = []
-        for line in line_arr:
-            if len(line) == 0:
-                continue
-            i = str(line).index(':', 10)
-            h = line[i - 2: i]
-            m = line[i + 1: i + 3]
-            # 计算分钟
-            minute = int(h) * 60 + int(m)
-            now = datetime.datetime.now().hour * 60 + datetime.datetime.now().minute
-            print(minute)
-            print(now)
-            if now - minute <= 30:
-                re_arr.append(line)
-        # 最后一个元素是 ''，输出最后一个有意义的行
+        re_arr = filter_message(arr)
         if len(re_arr) > 0:
             m = re_arr[-1]
             send_to_gotify(smart_url, m)
