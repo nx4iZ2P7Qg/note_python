@@ -15,7 +15,7 @@ pyautogui.hotkey('win', 'r')
 pyautogui.write('C:/Program Files (x86)/Tencent/WeChat/WeChat.exe')
 pyautogui.press('enter')
 
-# # 启动 v2rayN
+# 启动 v2rayN
 pyautogui.hotkey('win', 'r')
 pyautogui.write('D:/sync/app/v2rayN-Core/v2rayN.exe')
 pyautogui.press('enter')

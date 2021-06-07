@@ -4,7 +4,7 @@ import pyautogui
 # 每次 PyAutoGUI 调用后停顿
 pyautogui.PAUSE = 1
 
-# 鼠标在屏幕外且异常
+# 鼠标在屏幕外则异常
 pyautogui.FAILSAFE = True
 
 # 屏幕长宽
