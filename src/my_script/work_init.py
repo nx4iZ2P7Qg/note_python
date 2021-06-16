@@ -1,7 +1,7 @@
 # coding=utf-8
 import pyautogui
 
-pyautogui.PAUSE = 2
+pyautogui.PAUSE = 3
 
 pyautogui.FAILSAFE = True
 

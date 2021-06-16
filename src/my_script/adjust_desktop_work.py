@@ -25,7 +25,8 @@ def adjust_desktop():
         #     win.width = middle_width - win.left
         #     win.height = middle_height
         # 居中
-        elif 'Firefox Developer Edition' in win.title:
+        elif 'Firefox Developer Edition' in win.title or \
+                'Mozilla Firefox' in win.title:
             win.left = (screen_width - middle_width) / 2
             win.top = (screen_height - middle_height) / 2
             win.width = middle_width

@@ -3,7 +3,7 @@ import datetime
 import calendar
 
 token_common = 'As2cq6U_LzMViei'
-url_common = f'https://svrx.asuscomm.com:3313/message?token={token_common}'
+url_common = f'https://oxo.asuscomm.com:3313/message?token={token_common}'
 
 
 def send_to_gotify(url, title, message):
@@ -14,25 +14,39 @@ def send_to_gotify(url, title, message):
 today = datetime.date.today()
 month = today.month
 day = today.day
+if day % 7 == 0:
+    weeks_in_month = day // 7
+else:
+    weeks_in_month = day // 7 + 1
 weekday = today.weekday()
 today_str = today.strftime('%Y-%m-%d')
+
 
 # 天
 if day == 15:
     send_to_gotify(url_common, '小金库', '-')
     send_to_gotify(url_common, '水电费', '-')
 
+
 # 周
 if weekday == calendar.SUNDAY:
     send_to_gotify(url_common, 'nas 备份', '-')
     send_to_gotify(url_common, '游泳', '-')
 
+if weekday == calendar.SUNDAY and weeks_in_month == 2:
+    send_to_gotify(url_common, '收集 gal', '-')
+
+
 # 月
-if month == 1 and day == 1:
+if month % 3 == 0 and day == 1:
     send_to_gotify(url_common, 'nas 数据完整性测试', '-')
 
 if month % 3 == 0 and day == 21:
     send_to_gotify(url_common, '交房租', '3-31，9-30，男')
+
+if (month == 4 or month == 10) and day == 1:
+    send_to_gotify(url_common, '换小车雨刷', '-')
+
 
 # 年
 if today_str == '2021-07-10':
